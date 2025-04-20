@@ -1,0 +1,127 @@
+{
+  "name": "Chatbot_web",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "aec53179-75f9-45cf-a835-4c571bbd415c",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b5e064f4-3bda-4038-8c52-b4c6fbef0ec5",
+      "name": "Webhook",
+      "webhookId": "aec53179-75f9-45cf-a835-4c571bbd415c"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"messages\": {{ $json[\"body\"][\"history\"] }}\n}\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ],
+      "id": "1d5abb09-0939-4887-9549-c3998f199c90",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"message\": {{ JSON.stringify($json[\"output\"]) }}\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        980,
+        0
+      ],
+      "id": "8e61724b-7b70-43c1-bfaf-d146aa50c131",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "resource": "assistant",
+        "assistantId": {
+          "__rl": true,
+          "value": "asst_b75BAtGInLrdcMMYP8Xl2FLo",
+          "mode": "list",
+          "cachedResultName": "n8n_prueba"
+        },
+        "prompt": "define",
+        "text": "={{ JSON.stringify($json[\"messages\"]) }}\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        440,
+        0
+      ],
+      "id": "67c07dd8-a8df-43e5-8fa4-9f9a446e7fc4",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "87KxLhRFXLgPNmNd",
+          "name": "OpenAi account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e747d36f-3e95-4b78-9a24-7e62ca7bbc71",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "814743bbfbe12a95ad8b9414743a4f5fb674d25930b9ca8b6879486881090bc8"
+  },
+  "id": "a0HxiFFn7BrBqdxK",
+  "tags": []
+}

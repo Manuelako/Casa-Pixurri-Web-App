@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Animaciones y bordes */
+.season-container {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover para dar efecto al pasar el cursor */
+.season-container:hover {
+    transform: scale(1.02);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}

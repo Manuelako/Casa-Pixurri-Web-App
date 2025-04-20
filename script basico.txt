@@ -1,0 +1,64 @@
+<script>
+    function toggleChatbot() {
+        const chatbot = document.getElementById('chatbot');
+        chatbot.style.display = chatbot.style.display === 'none' ? 'flex' : 'none';
+    }
+
+    function startChat() {
+        const query = document.getElementById('search-query').value.trim();
+        if (query) {
+            document.getElementById('chatbot').style.display = 'flex'; // Asegurar que el chatbot se muestra al primer click
+            sendMessage(query);
+        }
+    }
+
+    // Historial de conversación (aunque no lo enviamos, lo mantenemos para futuras mejoras)
+    let chatHistory = [];
+
+    async function sendMessage() {
+        const input = document.getElementById('chat-input');
+        const chatContent = document.getElementById('chat-content');
+        const message = input.value.trim();
+
+        if (message) {
+            chatContent.innerHTML += `<div class='chatbot-message user-message'>${message}</div>`;
+            input.value = '';
+
+            try {
+                const response = await fetch('https://primary-production-1545.up.railway.app/webhook-test/75be23e0-daae-4a94-9d60-12a72ef85bd5', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: message })  // Solo enviamos el mensaje sin historial
+                });
+
+                let text = await response.text();  // Captura la respuesta en formato texto
+                console.log("Respuesta del servidor (sin procesar):", text); // Ver respuesta antes de parsearla
+
+                // Reemplazamos caracteres problemáticos antes de parsear
+                text = text.replace(/[\u0000-\u001F\u007F-\u009F]/g, ""); // Elimina caracteres de control
+
+                try {
+                    const data = JSON.parse(text);  // Intenta convertirlo en JSON
+
+                    if (data && data.message) {
+                        // Reemplazamos saltos de línea (\n) por <br> para mostrar correctamente en HTML
+                        const formattedMessage = data.message.replace(/\n/g, "<br>");
+                        chatContent.innerHTML += `<div class='chatbot-message bot-message'>${formattedMessage}</div>`;
+                    } else {
+                        chatContent.innerHTML += `<div class='chatbot-message bot-message'>No tengo una respuesta en este momento.</div>`;
+                    }
+                } catch (jsonError) {
+                    console.error("Error al procesar JSON:", jsonError);
+                    console.log("Texto recibido (potencialmente malformado):", text); // Imprimir el texto crudo para depuración
+                    chatContent.innerHTML += `<div class='chatbot-message bot-message'>Respuesta no válida del servidor.</div>`;
+                }
+
+            } catch (error) {
+                console.error("Error al obtener respuesta:", error);
+                chatContent.innerHTML += `<div class='chatbot-message bot-message'>Error en la respuesta del servidor.</div>`;
+            }
+
+            chatContent.scrollTop = chatContent.scrollHeight;
+        }
+    }
+</script>
