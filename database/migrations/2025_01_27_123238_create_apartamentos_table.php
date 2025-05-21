@@ -9,11 +9,14 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
         Schema::create('apartamentos', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->string('nombre'); // Nombre del apartamento
+            $table->text('descripcion'); // Descripción del apartamento
+            $table->string('imagen'); // Ruta de la imagen del apartamento
+            $table->timestamps(); // created_at y updated_at
         });
     }
 
